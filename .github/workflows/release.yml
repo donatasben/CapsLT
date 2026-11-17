@@ -1,0 +1,17 @@
+# Push a tag like v1.2.0 → builds CapsLT.zip and publishes it as a GitHub Release.
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: plutil -replace CFBundleShortVersionString -string "${GITHUB_REF_NAME#v}" Info.plist
+      - run: ./build.sh
+      - run: gh release create "$GITHUB_REF_NAME" build/CapsLT.zip --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

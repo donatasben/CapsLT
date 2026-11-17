@@ -13,7 +13,7 @@ The Globe (fn) key stays free for switching languages.
 
 ## Install
 
-1. Unzip `CapsLT.zip` and move `CapsLT.app` to Applications.
+1. Download [CapsLT.zip](https://github.com/donatasben/CapsLT/releases/latest/download/CapsLT.zip), unzip it, and move `CapsLT.app` to Applications.
 2. Open it. If macOS blocks it: System Settings → Privacy & Security → **Open Anyway** (one time only).
 3. Allow it in System Settings → Privacy & Security → **Accessibility**.
 4. Click **Ą** in the menu bar → turn on **Launch at login**.
@@ -29,3 +29,11 @@ After you install a new version, turn the Accessibility permission off and on ag
 ```
 
 Output: `build/CapsLT.app` and `build/CapsLT.zip`. Needs Xcode Command Line Tools.
+
+## Release
+
+Push a version tag. GitHub builds the app and makes a release with `CapsLT.zip`.
+
+```sh
+git tag v1.0.0 && git push origin v1.0.0
+```
