@@ -1,3 +1,5 @@
+![CapsLT](icons/CapsLT%20preview.jpg)
+
 # CapsLT
 
 Type Lithuanian letters without switching keyboard language.
