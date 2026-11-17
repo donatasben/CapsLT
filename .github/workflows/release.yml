@@ -1,17 +1,26 @@
-# Push a tag like v1.2.0 → builds CapsLT.zip and publishes it as a GitHub Release.
+# Builds CapsLT.zip and publishes it as a GitHub Release. Starts when:
+# - you push a tag like v1.2.0 (also when you publish a release with a new tag on github.com), or
+# - you click "Run workflow" in the Actions tab and type a version.
 name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, like v1.2.0"
+        required: true
 permissions:
   contents: write
+env:
+  TAG: ${{ inputs.version || github.ref_name }}
+  GH_TOKEN: ${{ github.token }}
 jobs:
   release:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - run: plutil -replace CFBundleShortVersionString -string "${GITHUB_REF_NAME#v}" Info.plist
+      - run: plutil -replace CFBundleShortVersionString -string "${TAG#v}" Info.plist
       - run: ./build.sh
-      - run: gh release create "$GITHUB_REF_NAME" build/CapsLT.zip --generate-notes
-        env:
-          GH_TOKEN: ${{ github.token }}
+      # Release made on github.com already exists → only attach the zip.
+      - run: gh release create "$TAG" build/CapsLT.zip --target "$GITHUB_SHA" --generate-notes || gh release upload "$TAG" build/CapsLT.zip --clobber
