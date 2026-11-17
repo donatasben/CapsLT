@@ -2,35 +2,17 @@
 
 Type Lithuanian letters without switching keyboard language.
 
-Hold `Caps lock` and press a key:
-
-* `ą`:
-   * `Caps lock` + `a`
-   * `Caps lock` + `1`
-* `č`:
-   * `Caps lock` + `c`
-   * `Caps lock` + `2`
-* `ę`:
-   * `Caps lock` + `e`
-   * `Caps lock` + `3`
-* `ė`:
-   * `Caps lock` + `w`
-   * `Caps lock` + `4`
-* `į`:
-   * `Caps lock` + `i`
-   * `Caps lock` + `5`
-* `š`:
-   * `Caps lock` + `s`
-   * `Caps lock` + `6`
-* `ų`:
-   * `Caps lock` + `u`
-   * `Caps lock` + `7`
-* `ū`:
-   * `Caps lock` + `y`
-   * `Caps lock` + `8`
-* `ž`:
-   * `Caps lock` + `z`
-   * `Caps lock` + `=`
+| Character | Press keys to type it |
+|:---------:|-----------------------|
+| `ą` | `Caps lock` + `a`<br>`Caps lock` + `1` |
+| `č` | `Caps lock` + `c`<br>`Caps lock` + `2` |
+| `ę` | `Caps lock` + `e`<br>`Caps lock` + `3` |
+| `ė` | `Caps lock` + `w`<br>`Caps lock` + `4` |
+| `į` | `Caps lock` + `i`<br>`Caps lock` + `5` |
+| `š` | `Caps lock` + `s`<br>`Caps lock` + `6` |
+| `ų` | `Caps lock` + `u`<br>`Caps lock` + `7` |
+| `ū` | `Caps lock` + `y`<br>`Caps lock` + `8` |
+| `ž` | `Caps lock` + `z`<br>`Caps lock` + `=` |
 
 Add `Shift` for uppercase:
 
