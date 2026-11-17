@@ -165,7 +165,7 @@ struct CapsLTApp: App {
             Divider()
             Button("Quit CapsLT") { NSApp.terminate(nil) }.keyboardShortcut("q")
         } label: {
-            Text("Ą")
+            Image(nsImage: { let i = NSImage(named: "MenuIcon")!; i.isTemplate = true; return i }())
         }
     }
 }
