@@ -34,6 +34,8 @@ If CapsLock is changed in System Settings → Keyboard → Keyboard Shortcuts �
 
 After you install a new version, turn the Accessibility permission off and on again.
 
+In password fields, macOS hides the keys from other apps. There, `Caps lock` works only as `Return`, `Escape`, or `Caps lock` (your menu choice), and it does not type Lithuanian letters.
+
 ## Build
 
 ```sh

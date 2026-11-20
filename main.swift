@@ -3,6 +3,7 @@ import SwiftUI
 import ServiceManagement
 import ApplicationServices
 import IOKit.hidsystem
+import Carbon
 
 // Physical key (macOS virtual keycode) → letter. Shift or Caps Lock on → uppercase.
 let letters: [Int64: String] = [
@@ -12,9 +13,16 @@ let letters: [Int64: String] = [
 let f18: Int64 = 79
 let capsHID = 0x700000039, f18HID = 0x70000006D
 
-enum TapAction: String, CaseIterable { case returnKey = "Return", escape = "Escape", capsLock = "Caps Lock" }
+enum TapAction: String, CaseIterable {
+    case returnKey = "Return", escape = "Escape", capsLock = "Caps Lock"
+    static var current: TapAction { TapAction(rawValue: UserDefaults.standard.string(forKey: "tapAction") ?? "") ?? .returnKey }
+    var hid: Int { [.returnKey: 0x700000028, .escape: 0x700000029, .capsLock: capsHID][self]! }
+}
 
-// MARK: - CapsLock → F18 remap (hidutil, keeps any other remaps the user has)
+// MARK: - CapsLock remap (hidutil, keeps any other remaps the user has)
+// Normal: CapsLock → F18, the event tap does the rest.
+// Password fields (Secure Input) hide keys from the event tap and drop sent keys,
+// so there CapsLock (and Karabiner's F18) become the tap action key itself.
 
 enum Remap {
     @discardableResult static func hidutil(_ args: String...) -> String {
@@ -36,7 +44,7 @@ enum Remap {
             let b = String(out[block.range])
             if let s = b.firstMatch(of: try! Regex(#"Src = (\d+)"#))?[1].substring,
                let d = b.firstMatch(of: try! Regex(#"Dst = (\d+)"#))?[1].substring,
-               let src = Int(s), let dst = Int(d), src != capsHID { pairs.insert([src, dst]) }
+               let src = Int(s), let dst = Int(d), src != capsHID, src != f18HID { pairs.insert([src, dst]) }
         }
         return pairs.map { ["HIDKeyboardModifierMappingSrc": $0[0], "HIDKeyboardModifierMappingDst": $0[1]] }
     }
@@ -46,8 +54,21 @@ enum Remap {
         hidutil("property", "--set", String(decoding: json, as: UTF8.self))
     }
 
-    static func apply() { set(others() + [["HIDKeyboardModifierMappingSrc": capsHID, "HIDKeyboardModifierMappingDst": f18HID]]) }
+    static func apply() {
+        let ours = IsSecureEventInputEnabled() ? [capsHID: TapAction.current.hid, f18HID: TapAction.current.hid] : [capsHID: f18HID]
+        set(others() + ours.map { ["HIDKeyboardModifierMappingSrc": $0.key, "HIDKeyboardModifierMappingDst": $0.value] })
+    }
     static func remove() { set(others()) }
+
+    /// Re-applies the remap when Secure Input turns on or off.
+    static func watchSecureInput() {
+        var secure = IsSecureEventInputEnabled()
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            guard IsSecureEventInputEnabled() != secure else { return }
+            secure.toggle()
+            apply()
+        }
+    }
 }
 
 // MARK: - Key handling
@@ -76,6 +97,7 @@ final class Keys: ObservableObject {
         guard let tap else { return false }
         CFRunLoopAddSource(CFRunLoopGetMain(), CFMachPortCreateRunLoopSource(nil, tap, 0), .commonModes)
         Remap.apply()
+        Remap.watchSecureInput()
         running = true
         return true
     }
@@ -106,7 +128,7 @@ final class Keys: ObservableObject {
     }
 
     private func tapAction() {
-        switch TapAction(rawValue: UserDefaults.standard.string(forKey: "tapAction") ?? "") ?? .returnKey {
+        switch TapAction.current {
         case .returnKey: press(36)
         case .escape: press(53)
         case .capsLock: toggleCapsLock()
